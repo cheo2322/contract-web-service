@@ -3,7 +3,7 @@ package com.threeastronauts.api.contract.domain.request;
 import com.threeastronauts.api.contract.dto.ClientDto;
 import com.threeastronauts.api.contract.dto.ContractDto;
 import com.threeastronauts.api.contract.dto.VendorDto;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,12 +17,12 @@ import lombok.Setter;
 @Builder
 public class ContractPostRequest {
 
-  @NotEmpty
+  @NotNull
   private ClientDto client;
 
-  @NotEmpty
+  @NotNull
   private ContractDto contract;
 
-  @NotEmpty
+  @NotNull
   private VendorDto vendor;
 }
