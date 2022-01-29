@@ -2,6 +2,7 @@ package com.threeastronauts.api.contract.service;
 
 import com.threeastronauts.api.contract.domain.request.ContractPostRequest;
 import com.threeastronauts.api.contract.dto.ContractDto;
+import com.threeastronauts.api.contract.exception.ResourceNotFoundException;
 import com.threeastronauts.api.contract.model.Contract;
 import com.threeastronauts.api.contract.repository.ClientRepository;
 import com.threeastronauts.api.contract.repository.ContractRepository;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Log4j2
 @Service
@@ -49,15 +49,13 @@ public class ContractService {
                 return vendor;
               })
               .orElseThrow(() -> {
-                log.error("error vendor!");
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+                throw new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Vendor not found!");
               });
 
           return client;
         })
         .orElseThrow(() -> {
-          log.error("error client!");
-          throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+          throw new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Client not found!");
         });
 
     return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -71,8 +69,7 @@ public class ContractService {
             .value(contract.getValue())
             .build())
         .orElseThrow(() -> {
-          log.error("error contract!");
-          throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+          throw new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Contract not found!");
         });
   }
 }
