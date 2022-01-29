@@ -68,6 +68,7 @@ public class ContractService {
         .map(contract -> ContractDto.builder()
             .approved(contract.getApproved())
             .terms(contract.getTerms())
+            .value(contract.getValue())
             .build())
         .orElseThrow(() -> {
           log.error("error contract!");

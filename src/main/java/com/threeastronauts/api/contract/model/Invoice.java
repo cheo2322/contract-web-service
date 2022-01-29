@@ -1,5 +1,6 @@
 package com.threeastronauts.api.contract.model;
 
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,13 +24,20 @@ import lombok.Setter;
 @Table(name = "invoices")
 public class Invoice {
 
+  public enum Status {
+    IN_PROGRESS,
+    SUBMITTED,
+    APPROVED
+  }
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "invoice_id")
   private long id;
 
-  private int approved;
   private String description;
+  private LocalDateTime creationDate;
+  private Status status;
 
   @Column(name = "time_in_hours")
   private double timeInHours;

@@ -4,9 +4,12 @@ import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
 import com.threeastronauts.api.contract.dto.InvoiceDto;
 import com.threeastronauts.api.contract.model.Contract;
 import com.threeastronauts.api.contract.model.Invoice;
+import com.threeastronauts.api.contract.model.Invoice.Status;
 import com.threeastronauts.api.contract.repository.ContractRepository;
 import com.threeastronauts.api.contract.repository.InvoiceRepository;
 import com.threeastronauts.api.contract.repository.VendorRepository;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,14 +37,13 @@ public class InvoiceService {
                   Double totalInvoices = invoiceRepository
                       .sumOfTotalInvoicesByVendorIdAndContractId(vendor, contract)
                       .orElse(0.0);
-
                   Double currentInvoice = invoicePostRequest.getInvoice().getTotal();
 
                   if (totalInvoices + currentInvoice <= contract.getValue()) {
-
                     Invoice invoice = Invoice.builder()
                         .description(createInvoiceDescription(contract))
-                        .approved(1)
+                        .creationDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                        .status(Status.APPROVED)
                         .contract(contract)
                         .vendor(vendor)
                         .timeInHours(invoicePostRequest.getInvoice().getTimeInHours())
@@ -80,6 +82,7 @@ public class InvoiceService {
   public InvoiceDto getInvoice(Long invoiceId) {
     return invoiceRepository.findById(invoiceId)
         .map(invoice -> InvoiceDto.builder()
+            .status(invoice.getStatus())
             .timeInHours(invoice.getTimeInHours())
             .hourCost(invoice.getHourCost())
             .otherMaterials(invoice.getOtherMaterials())
