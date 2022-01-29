@@ -27,32 +27,39 @@ public class InvoiceService {
 
   public void createNewInvoice(InvoicePostRequest invoicePostRequest) {
     vendorRepository.findByUsername(invoicePostRequest.getVendor().getUsername())
-        .map(vendor -> contractRepository.findById(invoicePostRequest.getContract().getId())
-            .map(contract -> {
-              Invoice invoice = Invoice.builder()
-                  .approved(1)
-                  .contract(contract)
-                  .vendor(vendor)
-                  .timeInHours(invoicePostRequest.getInvoice().getTimeInHours())
-                  .hourCost(invoicePostRequest.getInvoice().getHourCost())
-                  .otherMaterials(invoicePostRequest.getInvoice().getOtherMaterials())
-                  .otherMaterialsCost(invoicePostRequest.getInvoice().getOtherMaterialsCost())
-                  .total(invoicePostRequest.getInvoice().getTotal())
-                  .build();
+        .map(vendor -> {
+              if (invoiceRepository.countApprovedInvoicesByVendorId(vendor) <= 0) {
+                return contractRepository.findById(invoicePostRequest.getContract().getId())
+                    .map(contract -> {
+                      Invoice invoice = Invoice.builder()
+                          .approved(1)
+                          .contract(contract)
+                          .vendor(vendor)
+                          .timeInHours(invoicePostRequest.getInvoice().getTimeInHours())
+                          .hourCost(invoicePostRequest.getInvoice().getHourCost())
+                          .otherMaterials(invoicePostRequest.getInvoice().getOtherMaterials())
+                          .otherMaterialsCost(invoicePostRequest.getInvoice().getOtherMaterialsCost())
+                          .total(invoicePostRequest.getInvoice().getTotal())
+                          .build();
 
-              vendor.getInvoices().add(invoice);
-              contract.setInvoice(invoice);
+                      vendor.getInvoices().add(invoice);
+                      contract.setInvoice(invoice);
 
-              vendorRepository.save(vendor);
-              contractRepository.save(contract);
-              invoiceRepository.save(invoice);
+                      vendorRepository.save(vendor);
+                      contractRepository.save(contract);
+                      invoiceRepository.save(invoice);
 
-              return contract;
-            })
-            .orElseThrow(() -> {
-              log.error("error contract!");
-              throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-            })
+                      return contract;
+                    })
+                    .orElseThrow(() -> {
+                      log.error("error contract!");
+                      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+                    });
+              } else {
+                log.error("Vendor has already an approved invoice!");
+                throw new ResponseStatusException(HttpStatus.CONFLICT);
+              }
+            }
         )
         .orElseThrow(() -> {
           log.error("error vendor!");
