@@ -29,6 +29,7 @@ public class InvoiceService {
         .map(vendor -> contractRepository.findById(invoicePostRequest.getContract().getId())
             .map(contract -> {
               Invoice invoice = Invoice.builder()
+                  .approved(1)
                   .contract(contract)
                   .vendor(vendor)
                   .timeInHours(invoicePostRequest.getInvoice().getTimeInHours())

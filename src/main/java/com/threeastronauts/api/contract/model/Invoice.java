@@ -29,6 +29,8 @@ public class Invoice {
   @Column(name = "invoice_id")
   private long id;
 
+  private int approved;
+
   @Column(name = "time_in_hours")
   private double timeInHours;
 
