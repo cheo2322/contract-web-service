@@ -2,6 +2,8 @@ package com.threeastronauts.api.contract.service;
 
 import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
 import com.threeastronauts.api.contract.dto.InvoiceDto;
+import com.threeastronauts.api.contract.exception.ContractValueExceedException;
+import com.threeastronauts.api.contract.exception.ResourceNotFoundException;
 import com.threeastronauts.api.contract.model.Contract;
 import com.threeastronauts.api.contract.model.Invoice;
 import com.threeastronauts.api.contract.model.Invoice.Status;
@@ -14,7 +16,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Log4j2
 @Service
@@ -59,23 +60,20 @@ public class InvoiceService {
                     vendorRepository.save(vendor);
                     contractRepository.save(contract);
                     invoiceRepository.save(invoice);
+
                   } else {
-                    log.error("Invoices exceed the contract value by {} dollars!",
+                    throw new ContractValueExceedException(HttpStatus.HTTP_VERSION_NOT_SUPPORTED,
                         totalInvoices + currentInvoice - contract.getValue());
-                    throw new ResponseStatusException(HttpStatus.CONFLICT);
                   }
 
                   return contract;
                 })
                 .orElseThrow(() -> {
-                      log.error("error contract!");
-                      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                    }
-                )
+                  throw new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Contract not found!");
+                })
         )
         .orElseThrow(() -> {
-          log.error("error vendor!");
-          throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+          throw new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Vendor not found!");
         });
   }
 
@@ -91,8 +89,7 @@ public class InvoiceService {
             .total(invoice.getTotal())
             .build())
         .orElseThrow(() -> {
-          log.error("error vendor!");
-          throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+          throw new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Invoice not found!");
         });
   }
 

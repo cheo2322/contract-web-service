@@ -1,6 +1,7 @@
 package com.threeastronauts.api.contract.exception.handler;
 
 import com.threeastronauts.api.contract.domain.error.ErrorResponse;
+import com.threeastronauts.api.contract.exception.ContractValueExceedException;
 import com.threeastronauts.api.contract.exception.ResourceNotFoundException;
 import java.util.Objects;
 import lombok.extern.log4j.Log4j2;
@@ -46,6 +47,25 @@ public class ContractExceptionController {
                 Objects.requireNonNull(ex.getReason()).concat(" Please refer moreInfo section."))
             .userMessage(ex.getReason())
             .moreInfo("moreInfo/ERR-DB-004/solution")
+            .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ContractValueExceedException.class)
+    public ResponseEntity<ErrorResponse> handleContractValueExceedException(
+        ContractValueExceedException ex) {
+
+        String message = String
+            .format("Invoices exceed the contract value by %f dollars!", ex.getExceedValue());
+
+        log.error(message);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .code("ERR-VAL-002")
+            .userMessage(message)
+            .moreInfo("moreInfo/ERR-VAL-002")
             .build();
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
