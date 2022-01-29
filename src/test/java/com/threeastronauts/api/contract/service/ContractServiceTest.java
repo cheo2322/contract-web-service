@@ -49,11 +49,16 @@ class ContractServiceTest {
 
   @Test
   void shouldReturnContractInformation() {
-    Contract contract = ContractTestHelper.createContract();
+    Client client = ContractTestHelper.createClient();
+    Vendor vendor = ContractTestHelper.createVendor();
+    ContractPostRequest contractPostRequest = ContractTestHelper.createContractPostRequest();
 
-    contractRepository.save(contract);
+    clientRepository.save(client);
+    vendorRepository.save(vendor);
 
-    ContractDto contractDto = contractService.getContract(0L);
+    contractService.setUpNewContract(contractPostRequest);
+
+    ContractDto contractDto = contractService.getContract(1L);
 
     assertThat(contractDto.getTerms(), equalTo("Terms."));
   }
