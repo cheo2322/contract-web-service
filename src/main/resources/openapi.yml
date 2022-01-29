@@ -1,0 +1,234 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /contract-api/invoices:
+    get:
+      tags:
+        - contract-controller
+      operationId: getInvoice
+      parameters:
+        - name: clientId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: invoiceId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/InvoiceDto'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - contract-controller
+      operationId: postNewInvoice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoicePostRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /contract-api/contracts:
+    get:
+      tags:
+        - contract-controller
+      operationId: getContract
+      parameters:
+        - name: vendorId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: contractId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ContractDto'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - contract-controller
+      operationId: postNewContract
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractPostRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        developerMessage:
+          type: string
+        userMessage:
+          type: string
+        moreInfo:
+          type: string
+    ContractInvoiceDto:
+      required:
+        - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+    InvoiceDto:
+      required:
+        - total
+      type: object
+      properties:
+        description:
+          type: string
+        timeInHours:
+          type: number
+          format: double
+        hourCost:
+          type: number
+          format: double
+        otherMaterials:
+          type: string
+        otherMaterialsCost:
+          type: number
+          format: double
+        status:
+          type: string
+          enum:
+            - IN_PROGRESS
+            - SUBMITTED
+            - APPROVED
+        total:
+          type: number
+          format: double
+    InvoicePostRequest:
+      required:
+        - contract
+        - invoice
+        - vendor
+      type: object
+      properties:
+        vendor:
+          $ref: '#/components/schemas/VendorDto'
+        contract:
+          $ref: '#/components/schemas/ContractInvoiceDto'
+        invoice:
+          $ref: '#/components/schemas/InvoiceDto'
+    VendorDto:
+      required:
+        - username
+      type: object
+      properties:
+        username:
+          type: string
+    ClientDto:
+      required:
+        - username
+      type: object
+      properties:
+        username:
+          type: string
+    ContractDto:
+      required:
+        - terms
+        - value
+      type: object
+      properties:
+        approved:
+          type: integer
+          format: int32
+        terms:
+          type: string
+        value:
+          type: number
+          format: double
+    ContractPostRequest:
+      required:
+        - client
+        - contract
+        - vendor
+      type: object
+      properties:
+        client:
+          $ref: '#/components/schemas/ClientDto'
+        contract:
+          $ref: '#/components/schemas/ContractDto'
+        vendor:
+          $ref: '#/components/schemas/VendorDto'
