@@ -70,7 +70,9 @@ class ContractControllerTest {
     contractService.setUpNewContract(contractPostRequest);
 
     mockMvc.perform(MockMvcRequestBuilders
-            .get("/contract-api/{vendorId}/contracts/{contractId}", 2L, 2L))
+            .get("/contract-api/contracts")
+            .param("vendorId", String.valueOf(2L))
+            .param("contractId", String.valueOf(2L)))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.jsonPath("$.terms").value("Terms."));
   }
