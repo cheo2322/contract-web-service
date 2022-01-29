@@ -14,6 +14,8 @@ import lombok.Setter;
 @Builder
 public class ContractDto {
 
+  private int approved;
+
   @NotBlank
   private String terms;
 }

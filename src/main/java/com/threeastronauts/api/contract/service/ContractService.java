@@ -64,7 +64,10 @@ public class ContractService {
 
   public ContractDto getContract(Long id) {
     return contractRepository.findById(id)
-        .map(contract -> ContractDto.builder().terms(contract.getTerms()).build())
+        .map(contract -> ContractDto.builder()
+            .approved(contract.getApproved())
+            .terms(contract.getTerms())
+            .build())
         .orElseThrow(() -> {
           log.error("error contract!");
           throw new ResponseStatusException(HttpStatus.NOT_FOUND);
