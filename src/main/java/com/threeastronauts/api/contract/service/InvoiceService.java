@@ -1,6 +1,7 @@
 package com.threeastronauts.api.contract.service;
 
 import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
+import com.threeastronauts.api.contract.dto.InvoiceDto;
 import com.threeastronauts.api.contract.model.Invoice;
 import com.threeastronauts.api.contract.repository.ContractRepository;
 import com.threeastronauts.api.contract.repository.InvoiceRepository;
@@ -53,6 +54,21 @@ public class InvoiceService {
               throw new ResponseStatusException(HttpStatus.NOT_FOUND);
             })
         )
+        .orElseThrow(() -> {
+          log.error("error vendor!");
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        });
+  }
+
+  public InvoiceDto getInvoice(Long invoiceId) {
+    return invoiceRepository.findById(invoiceId)
+        .map(invoice -> InvoiceDto.builder()
+            .timeInHours(invoice.getTimeInHours())
+            .hourCost(invoice.getHourCost())
+            .otherMaterials(invoice.getOtherMaterials())
+            .otherMaterialsCost(invoice.getOtherMaterialsCost())
+            .total(invoice.getTotal())
+            .build())
         .orElseThrow(() -> {
           log.error("error vendor!");
           throw new ResponseStatusException(HttpStatus.NOT_FOUND);

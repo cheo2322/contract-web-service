@@ -3,6 +3,7 @@ package com.threeastronauts.api.contract.controller;
 import com.threeastronauts.api.contract.domain.request.ContractPostRequest;
 import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
 import com.threeastronauts.api.contract.dto.ContractDto;
+import com.threeastronauts.api.contract.dto.InvoiceDto;
 import com.threeastronauts.api.contract.service.ContractService;
 import com.threeastronauts.api.contract.service.InvoiceService;
 import javax.validation.Valid;
@@ -35,7 +36,7 @@ public class ContractController {
 
   @GetMapping("/contracts")
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<ContractDto> getContractById(@RequestParam Long vendorId,
+  public ResponseEntity<ContractDto> getContract(@RequestParam Long vendorId,
       @RequestParam Long contractId) {
 
     return ResponseEntity.ok(contractService.getContract(contractId));
@@ -48,5 +49,13 @@ public class ContractController {
 
     invoiceService.createNewInvoice(invoicePostRequest);
     return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
+
+  @GetMapping("/invoices")
+  @ResponseStatus(HttpStatus.OK)
+  public ResponseEntity<InvoiceDto> getInvoice(@RequestParam Long clientId,
+      @RequestParam Long invoiceId) {
+
+    return ResponseEntity.ok(invoiceService.getInvoice(invoiceId));
   }
 }
