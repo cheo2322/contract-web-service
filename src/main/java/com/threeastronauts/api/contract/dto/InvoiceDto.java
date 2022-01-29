@@ -15,6 +15,7 @@ import lombok.Setter;
 @Builder
 public class InvoiceDto {
 
+  private String description;
   private double timeInHours;
   private double hourCost;
   private String otherMaterials;

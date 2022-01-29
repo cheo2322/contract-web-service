@@ -82,6 +82,7 @@ public class InvoiceService {
   public InvoiceDto getInvoice(Long invoiceId) {
     return invoiceRepository.findById(invoiceId)
         .map(invoice -> InvoiceDto.builder()
+            .description(invoice.getDescription())
             .status(invoice.getStatus())
             .timeInHours(invoice.getTimeInHours())
             .hourCost(invoice.getHourCost())
