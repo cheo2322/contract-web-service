@@ -33,4 +33,7 @@ public class Vendor {
 
   @OneToMany(mappedBy = "vendor", fetch = FetchType.EAGER)
   private List<Contract> contracts;
+
+  @OneToMany(mappedBy = "vendor", fetch = FetchType.EAGER)
+  private List<Invoice> invoices;
 }

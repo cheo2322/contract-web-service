@@ -1,8 +1,10 @@
 package com.threeastronauts.api.contract.controller;
 
 import com.threeastronauts.api.contract.domain.request.ContractPostRequest;
+import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
 import com.threeastronauts.api.contract.dto.ContractDto;
 import com.threeastronauts.api.contract.service.ContractService;
+import com.threeastronauts.api.contract.service.InvoiceService;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,9 @@ public class ContractController {
   @Autowired
   ContractService contractService;
 
+  @Autowired
+  InvoiceService invoiceService;
+
   @PostMapping("/contracts")
   @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<Void> postNewContract(@RequestBody @Valid ContractPostRequest request) {
@@ -34,5 +39,14 @@ public class ContractController {
       @PathVariable Long contractId) {
 
     return ResponseEntity.ok(contractService.getContract(contractId));
+  }
+
+  @PostMapping("/invoices")
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResponseEntity<Void> postNewInvoice(
+      @RequestBody @Valid InvoicePostRequest invoicePostRequest) {
+
+    invoiceService.createNewInvoice(invoicePostRequest);
+    return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 }

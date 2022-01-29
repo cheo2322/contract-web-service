@@ -1,13 +1,11 @@
 package com.threeastronauts.api.contract.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -20,32 +18,35 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Setter
 @Getter
+@Setter
 @Entity
-@Table(name = "contracts")
-public class Contract {
+@Table(name = "invoices")
+public class Invoice {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "contract_id")
-  private Long id;
+  @Column(name = "invoice_id")
+  private long id;
 
-  private int approved;
+  @Column(name = "time_in_hours")
+  private double timeInHours;
 
-  @Lob
-  @Column(columnDefinition = "BLOB")
-  private String terms;
+  @Column(name = "hour_cost")
+  private double hourCost;
+
+  @Column(name = "other_materials")
+  private String otherMaterials;
+
+  @Column(name = "other_materials_cost")
+  private double otherMaterialsCost;
+
+  private double total;
 
   @ManyToOne
-  @JoinColumn(name = "client_id", nullable = false)
-  private Client client;
-
-  @ManyToOne
-  @JoinColumn(name = "vendor_id", nullable = false)
+  @JoinColumn(name = "vendor_id")
   private Vendor vendor;
 
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "invoice_id", referencedColumnName = "invoice_id")
-  private Invoice invoice;
+  @OneToOne(mappedBy = "invoice")
+  private Contract contract;
 }
