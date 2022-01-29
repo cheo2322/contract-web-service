@@ -7,7 +7,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +29,7 @@ public class Invoice {
   private long id;
 
   private int approved;
+  private String description;
 
   @Column(name = "time_in_hours")
   private double timeInHours;
@@ -49,6 +49,7 @@ public class Invoice {
   @JoinColumn(name = "vendor_id")
   private Vendor vendor;
 
-  @OneToOne(mappedBy = "invoice")
+  @ManyToOne
+  @JoinColumn(name = "contract_id")
   private Contract contract;
 }

@@ -1,6 +1,7 @@
 package com.threeastronauts.api.contract.dto;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,4 +19,7 @@ public class ContractDto {
 
   @NotBlank
   private String terms;
+
+  @NotNull
+  private Double value;
 }

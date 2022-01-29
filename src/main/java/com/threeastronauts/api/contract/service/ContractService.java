@@ -32,6 +32,7 @@ public class ContractService {
           vendorRepository.findByUsername(contractPostRequest.getVendor().getUsername())
               .map(vendor -> {
                 Contract contract = Contract.builder()
+                    .value(contractPostRequest.getContract().getValue())
                     .terms(contractPostRequest.getContract().getTerms())
                     .approved(1)
                     .client(client)

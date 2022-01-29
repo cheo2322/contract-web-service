@@ -20,5 +20,5 @@ public class InvoiceDto {
   private double otherMaterialsCost;
 
   @NotNull
-  private double total;
+  private Double total;
 }

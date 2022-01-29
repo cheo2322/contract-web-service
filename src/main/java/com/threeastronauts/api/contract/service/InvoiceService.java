@@ -2,6 +2,7 @@ package com.threeastronauts.api.contract.service;
 
 import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
 import com.threeastronauts.api.contract.dto.InvoiceDto;
+import com.threeastronauts.api.contract.model.Contract;
 import com.threeastronauts.api.contract.model.Invoice;
 import com.threeastronauts.api.contract.repository.ContractRepository;
 import com.threeastronauts.api.contract.repository.InvoiceRepository;
@@ -27,39 +28,48 @@ public class InvoiceService {
 
   public void createNewInvoice(InvoicePostRequest invoicePostRequest) {
     vendorRepository.findByUsername(invoicePostRequest.getVendor().getUsername())
-        .map(vendor -> {
-              if (invoiceRepository.countApprovedInvoicesByVendorId(vendor) <= 0) {
-                return contractRepository.findById(invoicePostRequest.getContract().getId())
-                    .map(contract -> {
-                      Invoice invoice = Invoice.builder()
-                          .approved(1)
-                          .contract(contract)
-                          .vendor(vendor)
-                          .timeInHours(invoicePostRequest.getInvoice().getTimeInHours())
-                          .hourCost(invoicePostRequest.getInvoice().getHourCost())
-                          .otherMaterials(invoicePostRequest.getInvoice().getOtherMaterials())
-                          .otherMaterialsCost(invoicePostRequest.getInvoice().getOtherMaterialsCost())
-                          .total(invoicePostRequest.getInvoice().getTotal())
-                          .build();
+        .map(vendor ->
+            contractRepository.findById(invoicePostRequest.getContract().getId())
+                .map(contract -> {
+                  Double totalInvoices = invoiceRepository
+                      .sumOfTotalInvoicesByVendorIdAndContractId(vendor, contract)
+                      .orElse(0.0);
 
-                      vendor.getInvoices().add(invoice);
-                      contract.setInvoice(invoice);
+                  Double currentInvoice = invoicePostRequest.getInvoice().getTotal();
 
-                      vendorRepository.save(vendor);
-                      contractRepository.save(contract);
-                      invoiceRepository.save(invoice);
+                  if (totalInvoices + currentInvoice <= contract.getValue()) {
 
-                      return contract;
-                    })
-                    .orElseThrow(() -> {
+                    Invoice invoice = Invoice.builder()
+                        .description(createInvoiceDescription(contract))
+                        .approved(1)
+                        .contract(contract)
+                        .vendor(vendor)
+                        .timeInHours(invoicePostRequest.getInvoice().getTimeInHours())
+                        .hourCost(invoicePostRequest.getInvoice().getHourCost())
+                        .otherMaterials(invoicePostRequest.getInvoice().getOtherMaterials())
+                        .otherMaterialsCost(invoicePostRequest.getInvoice().getOtherMaterialsCost())
+                        .total(invoicePostRequest.getInvoice().getTotal())
+                        .build();
+
+                    vendor.getInvoices().add(invoice);
+                    contract.getInvoices().add(invoice);
+
+                    vendorRepository.save(vendor);
+                    contractRepository.save(contract);
+                    invoiceRepository.save(invoice);
+                  } else {
+                    log.error("Invoices exceed the contract value by {} dollars!",
+                        totalInvoices + currentInvoice - contract.getValue());
+                    throw new ResponseStatusException(HttpStatus.CONFLICT);
+                  }
+
+                  return contract;
+                })
+                .orElseThrow(() -> {
                       log.error("error contract!");
                       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                    });
-              } else {
-                log.error("Vendor has already an approved invoice!");
-                throw new ResponseStatusException(HttpStatus.CONFLICT);
-              }
-            }
+                    }
+                )
         )
         .orElseThrow(() -> {
           log.error("error vendor!");
@@ -80,5 +90,9 @@ public class InvoiceService {
           log.error("error vendor!");
           throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         });
+  }
+
+  private String createInvoiceDescription(Contract contract) {
+    return "Contract value: " + contract.getValue();
   }
 }
