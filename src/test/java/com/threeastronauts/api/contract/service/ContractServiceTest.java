@@ -4,10 +4,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.threeastronauts.api.contract.domain.request.ContractPostRequest;
+import com.threeastronauts.api.contract.dto.ContractDto;
 import com.threeastronauts.api.contract.helper.ContractTestHelper;
 import com.threeastronauts.api.contract.model.Client;
+import com.threeastronauts.api.contract.model.Contract;
 import com.threeastronauts.api.contract.model.Vendor;
 import com.threeastronauts.api.contract.repository.ClientRepository;
+import com.threeastronauts.api.contract.repository.ContractRepository;
 import com.threeastronauts.api.contract.repository.VendorRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,9 @@ class ContractServiceTest {
   @Autowired
   VendorRepository vendorRepository;
 
+  @Autowired
+  ContractRepository contractRepository;
+
   @Test
   void shouldReturnOkWhenANewContractIsCreated() {
     Client client = ContractTestHelper.createClient();
@@ -39,5 +45,16 @@ class ContractServiceTest {
     ResponseEntity<Void> response = contractService.setUpNewContract(contractPostRequest);
 
     assertThat(response.getStatusCode(), equalTo(HttpStatus.CREATED));
+  }
+
+  @Test
+  void shouldReturnContractInformation() {
+    Contract contract = ContractTestHelper.createContract();
+
+    contractRepository.save(contract);
+
+    ContractDto contractDto = contractService.getContract(0L);
+
+    assertThat(contractDto.getTerms(), equalTo("Terms."));
   }
 }
