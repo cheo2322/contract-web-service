@@ -43,7 +43,7 @@ class ContractServiceTest {
   }
 
   @Test
-  void shouldReturnOkWhenANewContractIsCreated() {
+  void shouldReturnCreated() {
     client.setUsername("client-service");
     vendor.setUsername("vendor-username");
 

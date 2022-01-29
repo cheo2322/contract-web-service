@@ -1,8 +1,11 @@
 package com.threeastronauts.api.contract.helper;
 
 import com.threeastronauts.api.contract.domain.request.ContractPostRequest;
+import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
 import com.threeastronauts.api.contract.dto.ClientDto;
 import com.threeastronauts.api.contract.dto.ContractDto;
+import com.threeastronauts.api.contract.dto.ContractInvoiceDto;
+import com.threeastronauts.api.contract.dto.InvoiceDto;
 import com.threeastronauts.api.contract.dto.VendorDto;
 import com.threeastronauts.api.contract.model.Client;
 import com.threeastronauts.api.contract.model.Contract;
@@ -28,7 +31,7 @@ public class ContractTestHelper {
   public static Contract createContract() {
     return Contract.builder()
         .approved(1)
-        .terms("Terms")
+        .terms("Terms.")
         .build();
   }
 
@@ -41,7 +44,26 @@ public class ContractTestHelper {
             .username("vendor")
             .build())
         .contract(ContractDto.builder()
+            .value(100.00)
             .terms("Terms.")
+            .build())
+        .build();
+  }
+
+  public static InvoicePostRequest createInvoicePostRequest() {
+    return InvoicePostRequest.builder()
+        .invoice(InvoiceDto.builder()
+            .timeInHours(10)
+            .hourCost(4.9)
+            .otherMaterials("Materials")
+            .otherMaterialsCost(1.0)
+            .total(0.0)
+            .build())
+        .vendor(VendorDto.builder()
+            .username("test-vendor")
+            .build())
+        .contract(ContractInvoiceDto.builder()
+            .id(1L)
             .build())
         .build();
   }
