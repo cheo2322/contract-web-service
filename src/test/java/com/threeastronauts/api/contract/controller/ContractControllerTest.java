@@ -1,5 +1,8 @@
 package com.threeastronauts.api.contract.controller;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.threeastronauts.api.contract.domain.request.ContractPostRequest;
 import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
@@ -21,7 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -73,7 +75,7 @@ class ContractControllerTest {
     mockMvc.perform(MockMvcRequestBuilders.post("/contract-api/contracts")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(contractPostRequest)))
-        .andExpect(MockMvcResultMatchers.status().isCreated());
+        .andExpect(status().isCreated());
   }
 
   @Test
@@ -90,8 +92,8 @@ class ContractControllerTest {
             .get("/contract-api/contracts")
             .param("vendorId", String.valueOf(2L))
             .param("contractId", String.valueOf(2L)))
-        .andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(MockMvcResultMatchers.jsonPath("$.terms").value("Terms."));
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.terms").value("Terms."));
   }
 
   @Test
@@ -110,7 +112,7 @@ class ContractControllerTest {
     mockMvc.perform(MockMvcRequestBuilders.post("/contract-api/invoices")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(invoicePostRequest)))
-        .andExpect(MockMvcResultMatchers.status().isCreated());
+        .andExpect(status().isCreated());
   }
 
   @Test
@@ -131,13 +133,41 @@ class ContractControllerTest {
             .get("/contract-api/invoices")
             .param("clientId", String.valueOf(1L))
             .param("invoiceId", String.valueOf(1L)))
-        .andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(MockMvcResultMatchers.jsonPath("$.timeInHours").value(10.0))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.hourCost").value(4.9))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.otherMaterials").value("Materials"))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.otherMaterialsCost").value(1.0))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(Status.APPROVED.toString()))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.total").value(0.0))
-    ;
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.timeInHours").value(10.0))
+        .andExpect(jsonPath("$.hourCost").value(4.9))
+        .andExpect(jsonPath("$.otherMaterials").value("Materials"))
+        .andExpect(jsonPath("$.otherMaterialsCost").value(1.0))
+        .andExpect(jsonPath("$.status").value(Status.APPROVED.toString()))
+        .andExpect(jsonPath("$.total").value(0.0));
+  }
+
+  @Test
+  void shouldReturnBadRequestResponse_whenBodyIsNotValid() throws Exception {
+    ContractPostRequest request = ContractPostRequest.builder().build();
+
+    mockMvc.perform(MockMvcRequestBuilders.post("/contract-api/contracts")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("ERR-VAL-001"))
+        .andExpect(jsonPath("$.developerMessage").value(
+            "Some errors have been occurred with data. Please refer moreInfo section."))
+        .andExpect(jsonPath("$.userMessage").value("Sorry! An internal error has been occurred!"))
+        .andExpect(jsonPath("$.moreInfo").value("moreInfo/ERR-VAL-001/solution"));
+  }
+
+  @Test
+  void shouldReturnResourceNotFoundResponse_whenContractIsNotFound() throws Exception {
+    mockMvc.perform(MockMvcRequestBuilders
+            .get("/contract-api/invoices")
+            .param("clientId", String.valueOf(-1L))
+            .param("invoiceId", String.valueOf(-1L)))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.code").value("ERR-DB-004"))
+        .andExpect(jsonPath("$.developerMessage").value(
+            "Invoice not found! Please refer moreInfo section."))
+        .andExpect(jsonPath("$.userMessage").value("Invoice not found!"))
+        .andExpect(jsonPath("$.moreInfo").value("moreInfo/ERR-DB-004/solution"));
   }
 }

@@ -2,11 +2,13 @@ package com.threeastronauts.api.contract.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.threeastronauts.api.contract.domain.request.ContractPostRequest;
 import com.threeastronauts.api.contract.dto.ClientDto;
 import com.threeastronauts.api.contract.dto.ContractDto;
 import com.threeastronauts.api.contract.dto.VendorDto;
+import com.threeastronauts.api.contract.exception.ResourceNotFoundException;
 import com.threeastronauts.api.contract.helper.ContractTestHelper;
 import com.threeastronauts.api.contract.model.Client;
 import com.threeastronauts.api.contract.model.Vendor;
@@ -86,5 +88,44 @@ class ContractServiceTest {
     ContractDto contractDto = contractService.getContract(1L);
 
     assertThat(contractDto.getTerms(), equalTo("Terms."));
+  }
+
+  @Test
+  void shouldThrowsClientResourceNotFoundException() {
+    contractPostRequest.getClient().setUsername("");
+
+    ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+        () -> contractService.setUpNewContract(contractPostRequest));
+
+    assertThat(exception.getStatus(), equalTo(HttpStatus.NOT_FOUND));
+    assertThat(exception.getReason(), equalTo("Client not found!"));
+  }
+
+  @Test
+  void shouldThrowsVendorResourceNotFoundException() {
+    Client client1 = Client.builder()
+        .id(10L)
+        .username("client0")
+        .build();
+
+    contractPostRequest.setClient(ClientDto.builder().username(client1.getUsername()).build());
+    contractPostRequest.getVendor().setUsername("");
+
+    clientRepository.save(client1);
+
+    ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+        () -> contractService.setUpNewContract(contractPostRequest));
+
+    assertThat(exception.getStatus(), equalTo(HttpStatus.NOT_FOUND));
+    assertThat(exception.getReason(), equalTo("Vendor not found!"));
+  }
+
+  @Test
+  void shouldReturnContractResourceNotFoundException() {
+    ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+        () -> contractService.getContract(0L));
+
+    assertThat(exception.getStatus(), equalTo(HttpStatus.NOT_FOUND));
+    assertThat(exception.getReason(), equalTo("Contract not found!"));
   }
 }

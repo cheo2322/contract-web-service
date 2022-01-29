@@ -2,11 +2,14 @@ package com.threeastronauts.api.contract.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
 import com.threeastronauts.api.contract.dto.ContractInvoiceDto;
 import com.threeastronauts.api.contract.dto.InvoiceDto;
 import com.threeastronauts.api.contract.dto.VendorDto;
+import com.threeastronauts.api.contract.exception.ContractValueExceedException;
+import com.threeastronauts.api.contract.exception.ResourceNotFoundException;
 import com.threeastronauts.api.contract.helper.ContractTestHelper;
 import com.threeastronauts.api.contract.model.Client;
 import com.threeastronauts.api.contract.model.Contract;
@@ -16,10 +19,11 @@ import com.threeastronauts.api.contract.repository.ContractRepository;
 import com.threeastronauts.api.contract.repository.InvoiceRepository;
 import com.threeastronauts.api.contract.repository.VendorRepository;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 
 @SpringBootTest
 class InvoiceServiceTest {
@@ -39,13 +43,13 @@ class InvoiceServiceTest {
   @Autowired
   InvoiceRepository invoiceRepository;
 
-  private static Client client;
-  private static Vendor vendor;
-  private static Contract contract;
-  private static InvoicePostRequest invoicePostRequest;
+  private Client client;
+  private Vendor vendor;
+  private Contract contract;
+  private InvoicePostRequest invoicePostRequest;
 
-  @BeforeAll
-  static void setUp() {
+  @BeforeEach
+  void setUp() {
     client = ContractTestHelper.createClient();
     vendor = ContractTestHelper.createVendor();
     contract = ContractTestHelper.createContract();
@@ -88,5 +92,62 @@ class InvoiceServiceTest {
     InvoiceDto invoice = invoiceService.getInvoice(1L);
 
     assertThat(invoice.getTimeInHours(), equalTo(10.0));
+  }
+
+  @Test
+  void shouldThrowsVendorResourceNotFoundException() {
+    invoicePostRequest.getVendor().setUsername("");
+
+    ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+        () -> invoiceService.createNewInvoice(invoicePostRequest));
+
+    assertThat(exception.getStatus(), equalTo(HttpStatus.NOT_FOUND));
+  }
+
+  @Test
+  void shouldThrowsContractResourceNotFoundException() {
+    Vendor vendor = Vendor.builder()
+        .id(10L)
+        .username("client0")
+        .build();
+
+    invoicePostRequest.setVendor(VendorDto.builder().username(vendor.getUsername()).build());
+    invoicePostRequest.getContract().setId(-1L);
+
+    vendorRepository.save(vendor);
+
+    ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+        () -> invoiceService.createNewInvoice(invoicePostRequest));
+
+    assertThat(exception.getStatus(), equalTo(HttpStatus.NOT_FOUND));
+    assertThat(exception.getReason(), equalTo("Contract not found!"));
+  }
+
+  @Test
+  void shouldReturnContractResourceNotFoundException() {
+    ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+        () -> invoiceService.getInvoice(0L));
+
+    assertThat(exception.getStatus(), equalTo(HttpStatus.NOT_FOUND));
+    assertThat(exception.getReason(), equalTo("Invoice not found!"));
+  }
+
+  @Test
+  void shouldThrowsAContractValueExceedException() {
+    vendor.setUsername("error");
+    contract.setClient(client);
+    contract.setVendor(vendor);
+
+    invoicePostRequest.getVendor().setUsername(vendor.getUsername());
+    invoicePostRequest.getInvoice().setTotal(200.0);
+
+    clientRepository.save(client);
+    vendorRepository.save(vendor);
+    contractRepository.save(contract);
+
+    ContractValueExceedException exception = assertThrows(ContractValueExceedException.class,
+        () -> invoiceService.createNewInvoice(invoicePostRequest));
+
+    assertThat(exception.getExceedValue(), equalTo(100.0));
   }
 }
