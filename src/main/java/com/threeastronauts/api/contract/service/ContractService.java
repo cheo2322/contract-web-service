@@ -1,6 +1,7 @@
 package com.threeastronauts.api.contract.service;
 
 import com.threeastronauts.api.contract.domain.request.ContractPostRequest;
+import com.threeastronauts.api.contract.dto.ContractDto;
 import com.threeastronauts.api.contract.model.Contract;
 import com.threeastronauts.api.contract.repository.ClientRepository;
 import com.threeastronauts.api.contract.repository.ContractRepository;
@@ -47,17 +48,26 @@ public class ContractService {
                 return vendor;
               })
               .orElseThrow(() -> {
-                log.error("error vendors!");
+                log.error("error vendor!");
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
               });
 
           return client;
         })
         .orElseThrow(() -> {
-          log.error("error clients!");
+          log.error("error client!");
           throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         });
 
     return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
+
+  public ContractDto getContract(Long id) {
+    return contractRepository.findById(id)
+        .map(contract -> ContractDto.builder().terms(contract.getTerms()).build())
+        .orElseThrow(() -> {
+          log.error("error contract!");
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        });
   }
 }
