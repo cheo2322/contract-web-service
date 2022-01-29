@@ -45,3 +45,5 @@ jacocoTestReport {
 		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
 	}
 }
+
+ext['log4j2.version'] = "2.17.0"
