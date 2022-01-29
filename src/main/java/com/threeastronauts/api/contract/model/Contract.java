@@ -33,6 +33,8 @@ public class Contract {
   private Long id;
 
   private int approved;
+
+  @Column(name = "contract_value")
   private double value;
 
   @Lob

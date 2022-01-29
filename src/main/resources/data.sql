@@ -1,3 +1,5 @@
-INSERT INTO clients (username) VALUES ('test-user')
+insert into clients (username) values ('test-user')
 
-INSERT INTO vendors (username) VALUES ('test-vendor')
+insert into vendors (username) values ('test-vendor')
+
+insert into contracts (approved, terms, contract_value, client_id, vendor_id) values (1, '5465726d732e', 100.0, 1, 1)
