@@ -19,6 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @Entity
 @Table(name = "clients")
 public class Client {
@@ -30,7 +31,6 @@ public class Client {
 
   private String username;
 
-  @Setter
   @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
   private List<Contract> contracts;
 }

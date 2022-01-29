@@ -8,6 +8,7 @@ import com.threeastronauts.api.contract.model.Vendor;
 import com.threeastronauts.api.contract.repository.ClientRepository;
 import com.threeastronauts.api.contract.repository.VendorRepository;
 import com.threeastronauts.api.contract.service.ContractService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -36,13 +37,19 @@ class ContractControllerTest {
   @Autowired
   ObjectMapper objectMapper;
 
+  private static ContractPostRequest contractPostRequest;
+  private static Client client;
+  private static Vendor vendor;
+
+  @BeforeAll
+  static void setUp() {
+    contractPostRequest = ContractTestHelper.createContractPostRequest();
+    client = ContractTestHelper.createClient();
+    vendor = ContractTestHelper.createVendor();
+  }
+
   @Test
   void shouldReturn201Response_whenAClientCreateANewContract() throws Exception {
-    ContractPostRequest contractPostRequest = ContractTestHelper.createContractPostRequest();
-
-    Client client = ContractTestHelper.createClient();
-    Vendor vendor = ContractTestHelper.createVendor();
-
     clientRepository.save(client);
     vendorRepository.save(vendor);
 
@@ -54,9 +61,8 @@ class ContractControllerTest {
 
   @Test
   void shouldReturnAContract_whenIsCalledByAVendor() throws Exception {
-    Client client = ContractTestHelper.createClient();
-    Vendor vendor = ContractTestHelper.createVendor();
-    ContractPostRequest contractPostRequest = ContractTestHelper.createContractPostRequest();
+    client.setId(2L);
+    vendor.setId(2L);
 
     clientRepository.save(client);
     vendorRepository.save(vendor);
@@ -64,7 +70,7 @@ class ContractControllerTest {
     contractService.setUpNewContract(contractPostRequest);
 
     mockMvc.perform(MockMvcRequestBuilders
-            .get("/contract-api/{vendorId}/contracts/{contractId}", 1L, 1L))
+            .get("/contract-api/{vendorId}/contracts/{contractId}", 2L, 2L))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.jsonPath("$.terms").value("Terms."));
   }
