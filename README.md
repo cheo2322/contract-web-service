@@ -20,3 +20,11 @@ attached to the project at the root directory.
 Using MySQl Workbench, the next database model has been designed:
 
 ![db_model](/assets/image1.png)
+
+## OpenApi
+
+You are able to find the OpenApi Specification which details the
+endpoints and payloads of this project. This document has been
+generated with Swagger and is located at /src/main/resources/openapi.yml
+
+![openapi](/assets/openapi.png)
