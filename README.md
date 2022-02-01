@@ -28,3 +28,7 @@ endpoints and payloads of this project. This document has been
 generated with Swagger and is located at /src/main/resources/openapi.yml
 
 ![openapi](/assets/openapi.png)
+
+Additionally, it could be generated from Spring Boot at any time while
+the service is running, just execute ```$ ./gradlew bootRun```
+and visit http://localhost:8080/swagger-ui.html from a web browser.
