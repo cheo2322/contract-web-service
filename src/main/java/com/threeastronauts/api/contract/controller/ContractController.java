@@ -1,6 +1,7 @@
 package com.threeastronauts.api.contract.controller;
 
 import com.threeastronauts.api.contract.domain.request.ContractPostRequest;
+import com.threeastronauts.api.contract.domain.request.InvoicePatchRequest;
 import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
 import com.threeastronauts.api.contract.dto.ContractDto;
 import com.threeastronauts.api.contract.dto.InvoiceDto;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +39,6 @@ public class ContractController {
   @GetMapping("/contracts")
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<ContractDto> getContract(@RequestParam Long contractId) {
-
     return ResponseEntity.ok(contractService.getContract(contractId));
   }
 
@@ -53,7 +54,15 @@ public class ContractController {
   @GetMapping("/invoices")
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<InvoiceDto> getInvoice(@RequestParam Long invoiceId) {
-
     return ResponseEntity.ok(invoiceService.getInvoice(invoiceId));
+  }
+
+  @PatchMapping("/invoices")
+  @ResponseStatus(HttpStatus.OK)
+  public ResponseEntity<Void> updateInvoiceStatus(
+      @RequestBody @Valid InvoicePatchRequest invoicePatchRequest) {
+
+    invoiceService.updateInvoiceStatus(invoicePatchRequest);
+    return ResponseEntity.ok().build();
   }
 }

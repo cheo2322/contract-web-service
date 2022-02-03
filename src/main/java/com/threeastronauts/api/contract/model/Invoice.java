@@ -27,7 +27,8 @@ public class Invoice {
   public enum Status {
     IN_PROGRESS,
     SUBMITTED,
-    APPROVED
+    APPROVED,
+    VOID
   }
 
   @Id

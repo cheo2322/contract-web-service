@@ -1,5 +1,6 @@
 package com.threeastronauts.api.contract.service;
 
+import com.threeastronauts.api.contract.domain.request.InvoicePatchRequest;
 import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
 import com.threeastronauts.api.contract.dto.InvoiceDto;
 import com.threeastronauts.api.contract.exception.ContractValueExceedException;
@@ -78,6 +79,16 @@ public class InvoiceService {
         .orElseThrow(() -> {
           throw new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Invoice not found!");
         });
+  }
+
+  public void updateInvoiceStatus(InvoicePatchRequest invoicePatchRequest) {
+    Invoice invoice = invoiceRepository.findById(invoicePatchRequest.getId()).orElseThrow(() -> {
+      throw new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Invoice not found!");
+    });
+
+    invoice.setStatus(invoicePatchRequest.getStatus());
+
+    invoiceRepository.save(invoice);
   }
 
   private String createInvoiceDescription(Contract contract) {
