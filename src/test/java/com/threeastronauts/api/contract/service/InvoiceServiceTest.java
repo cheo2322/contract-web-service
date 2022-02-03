@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
 import com.threeastronauts.api.contract.dto.ContractInvoiceDto;
 import com.threeastronauts.api.contract.dto.InvoiceDto;
-import com.threeastronauts.api.contract.dto.VendorDto;
 import com.threeastronauts.api.contract.exception.ContractValueExceedException;
 import com.threeastronauts.api.contract.exception.ResourceNotFoundException;
 import com.threeastronauts.api.contract.helper.ContractTestHelper;
@@ -62,8 +61,6 @@ class InvoiceServiceTest {
     contract.setClient(client);
     contract.setVendor(vendor);
 
-    invoicePostRequest.getVendor().setUsername(vendor.getUsername());
-
     clientRepository.save(client);
     vendorRepository.save(vendor);
     contractRepository.save(contract);
@@ -80,7 +77,6 @@ class InvoiceServiceTest {
     contract.setClient(client);
     contract.setVendor(vendor);
 
-    invoicePostRequest.setVendor(VendorDto.builder().username(vendor.getUsername()).build());
     invoicePostRequest.setContract(ContractInvoiceDto.builder().id(contract.getId()).build());
 
     clientRepository.save(client);
@@ -96,7 +92,7 @@ class InvoiceServiceTest {
 
   @Test
   void shouldThrowsVendorResourceNotFoundException() {
-    invoicePostRequest.getVendor().setUsername("");
+    invoicePostRequest.getContract().setId(-1L);
 
     ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
         () -> invoiceService.createNewInvoice(invoicePostRequest));
@@ -111,7 +107,6 @@ class InvoiceServiceTest {
         .username("client0")
         .build();
 
-    invoicePostRequest.setVendor(VendorDto.builder().username(vendor.getUsername()).build());
     invoicePostRequest.getContract().setId(-1L);
 
     vendorRepository.save(vendor);
@@ -138,7 +133,6 @@ class InvoiceServiceTest {
     contract.setClient(client);
     contract.setVendor(vendor);
 
-    invoicePostRequest.getVendor().setUsername(vendor.getUsername());
     invoicePostRequest.getInvoice().setTotal(200.0);
 
     clientRepository.save(client);

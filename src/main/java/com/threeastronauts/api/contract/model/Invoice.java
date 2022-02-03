@@ -54,10 +54,6 @@ public class Invoice {
   private double total;
 
   @ManyToOne
-  @JoinColumn(name = "vendor_id")
-  private Vendor vendor;
-
-  @ManyToOne
   @JoinColumn(name = "contract_id")
   private Contract contract;
 }

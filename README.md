@@ -19,7 +19,7 @@ attached to the project at the root directory.
 
 Using MySQl Workbench, the next database model has been designed:
 
-![db_model](/assets/image1.png)
+![db_model](/assets/ERM.png)
 
 ## OpenApi
 

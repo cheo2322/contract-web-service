@@ -9,7 +9,6 @@ import com.threeastronauts.api.contract.model.Invoice;
 import com.threeastronauts.api.contract.model.Invoice.Status;
 import com.threeastronauts.api.contract.repository.ContractRepository;
 import com.threeastronauts.api.contract.repository.InvoiceRepository;
-import com.threeastronauts.api.contract.repository.VendorRepository;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import lombok.extern.log4j.Log4j2;
@@ -22,58 +21,46 @@ import org.springframework.stereotype.Service;
 public class InvoiceService {
 
   @Autowired
-  VendorRepository vendorRepository;
-
-  @Autowired
   ContractRepository contractRepository;
 
   @Autowired
   InvoiceRepository invoiceRepository;
 
   public void createNewInvoice(InvoicePostRequest invoicePostRequest) {
-    vendorRepository.findByUsername(invoicePostRequest.getVendor().getUsername())
-        .map(vendor ->
-            contractRepository.findById(invoicePostRequest.getContract().getId())
-                .map(contract -> {
-                  Double totalInvoices = invoiceRepository
-                      .sumOfTotalInvoicesByVendorIdAndContractId(vendor, contract)
-                      .orElse(0.0);
-                  Double currentInvoice = invoicePostRequest.getInvoice().getTotal();
+    contractRepository.findById(invoicePostRequest.getContract().getId())
+        .map(contract -> {
+          Double totalInvoices = invoiceRepository
+              .sumOfTotalInvoicesByVendorIdAndContractId(contract)
+              .orElse(0.0);
+          Double currentInvoice = invoicePostRequest.getInvoice().getTotal();
 
-                  if (totalInvoices + currentInvoice <= contract.getValue()) {
-                    Invoice invoice = Invoice.builder()
-                        .description(createInvoiceDescription(contract))
-                        .creationDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
-                        .status(Status.APPROVED)
-                        .contract(contract)
-                        .vendor(vendor)
-                        .timeInHours(invoicePostRequest.getInvoice().getTimeInHours())
-                        .hourCost(invoicePostRequest.getInvoice().getHourCost())
-                        .otherMaterials(invoicePostRequest.getInvoice().getOtherMaterials())
-                        .otherMaterialsCost(invoicePostRequest.getInvoice().getOtherMaterialsCost())
-                        .total(invoicePostRequest.getInvoice().getTotal())
-                        .build();
+          if (totalInvoices + currentInvoice <= contract.getValue()) {
+            Invoice invoice = Invoice.builder()
+                .description(createInvoiceDescription(contract))
+                .creationDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                .status(Status.APPROVED)
+                .contract(contract)
+                .timeInHours(invoicePostRequest.getInvoice().getTimeInHours())
+                .hourCost(invoicePostRequest.getInvoice().getHourCost())
+                .otherMaterials(invoicePostRequest.getInvoice().getOtherMaterials())
+                .otherMaterialsCost(invoicePostRequest.getInvoice().getOtherMaterialsCost())
+                .total(invoicePostRequest.getInvoice().getTotal())
+                .build();
 
-                    vendor.getInvoices().add(invoice);
-                    contract.getInvoices().add(invoice);
+            contract.getInvoices().add(invoice);
 
-                    vendorRepository.save(vendor);
-                    contractRepository.save(contract);
-                    invoiceRepository.save(invoice);
+            contractRepository.save(contract);
+            invoiceRepository.save(invoice);
 
-                  } else {
-                    throw new ContractValueExceedException(HttpStatus.HTTP_VERSION_NOT_SUPPORTED,
-                        totalInvoices + currentInvoice - contract.getValue());
-                  }
+          } else {
+            throw new ContractValueExceedException(HttpStatus.HTTP_VERSION_NOT_SUPPORTED,
+                totalInvoices + currentInvoice - contract.getValue());
+          }
 
-                  return contract;
-                })
-                .orElseThrow(() -> {
-                  throw new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Contract not found!");
-                })
-        )
+          return contract;
+        })
         .orElseThrow(() -> {
-          throw new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Vendor not found!");
+          throw new ResourceNotFoundException(HttpStatus.NOT_FOUND, "Contract not found!");
         });
   }
 
