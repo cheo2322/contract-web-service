@@ -97,7 +97,7 @@ class InvoiceServiceTest {
   @Test
   void shouldUpdateAnInvoiceStatusToVoid() {
     Invoice invoice = Invoice.builder()
-        .id(12L)
+        .id(1L)
         .status(Status.APPROVED)
         .build();
 
@@ -108,7 +108,7 @@ class InvoiceServiceTest {
 
     invoiceRepository.save(invoice);
     invoiceService.updateInvoiceStatus(request);
-    Invoice invoiceUpdated = invoiceRepository.findById(12L).orElse(null);
+    InvoiceDto invoiceUpdated = invoiceService.getInvoice(invoice.getId());
 
     assertThat(invoiceUpdated, notNullValue());
     assertThat(invoiceUpdated.getStatus(), equalTo(Status.VOID));

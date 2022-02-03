@@ -147,15 +147,19 @@ class ContractControllerTest {
   }
 
   @Test
-  void shouldReturnOk_whenAnInvoiceIsMarkedAsVoid() throws Exception {
+  void shouldReturnOk_whenAnInvoiceStatusIsUpdated() throws Exception {
     Invoice invoice = Invoice.builder()
-        .id(11L)
+        .id(1L)
+        .timeInHours(10.0)
+        .hourCost(4.9)
         .status(Status.APPROVED)
+        .otherMaterials("Materials")
+        .otherMaterialsCost(1.0)
         .build();
 
     InvoicePatchRequest request = InvoicePatchRequest.builder()
         .id(invoice.getId())
-        .status(Status.VOID)
+        .status(Status.APPROVED)
         .build();
 
     invoiceRepository.save(invoice);
