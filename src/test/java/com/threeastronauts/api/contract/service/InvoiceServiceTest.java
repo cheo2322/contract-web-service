@@ -2,8 +2,10 @@ package com.threeastronauts.api.contract.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.threeastronauts.api.contract.domain.request.InvoicePatchRequest;
 import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
 import com.threeastronauts.api.contract.dto.ContractInvoiceDto;
 import com.threeastronauts.api.contract.dto.InvoiceDto;
@@ -12,6 +14,8 @@ import com.threeastronauts.api.contract.exception.ResourceNotFoundException;
 import com.threeastronauts.api.contract.helper.ContractTestHelper;
 import com.threeastronauts.api.contract.model.Client;
 import com.threeastronauts.api.contract.model.Contract;
+import com.threeastronauts.api.contract.model.Invoice;
+import com.threeastronauts.api.contract.model.Invoice.Status;
 import com.threeastronauts.api.contract.model.Vendor;
 import com.threeastronauts.api.contract.repository.ClientRepository;
 import com.threeastronauts.api.contract.repository.ContractRepository;
@@ -88,6 +92,26 @@ class InvoiceServiceTest {
     InvoiceDto invoice = invoiceService.getInvoice(1L);
 
     assertThat(invoice.getTimeInHours(), equalTo(10.0));
+  }
+
+  @Test
+  void shouldUpdateAnInvoiceStatusToVoid() {
+    Invoice invoice = Invoice.builder()
+        .id(12L)
+        .status(Status.APPROVED)
+        .build();
+
+    InvoicePatchRequest request = InvoicePatchRequest.builder()
+        .id(invoice.getId())
+        .status(Status.VOID)
+        .build();
+
+    invoiceRepository.save(invoice);
+    invoiceService.updateInvoiceStatus(request);
+    Invoice invoiceUpdated = invoiceRepository.findById(12L).orElse(null);
+
+    assertThat(invoiceUpdated, notNullValue());
+    assertThat(invoiceUpdated.getStatus(), equalTo(Status.VOID));
   }
 
   @Test

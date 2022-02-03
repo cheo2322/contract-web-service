@@ -5,14 +5,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.threeastronauts.api.contract.domain.request.ContractPostRequest;
+import com.threeastronauts.api.contract.domain.request.InvoicePatchRequest;
 import com.threeastronauts.api.contract.domain.request.InvoicePostRequest;
 import com.threeastronauts.api.contract.helper.ContractTestHelper;
 import com.threeastronauts.api.contract.model.Client;
 import com.threeastronauts.api.contract.model.Contract;
+import com.threeastronauts.api.contract.model.Invoice;
 import com.threeastronauts.api.contract.model.Invoice.Status;
 import com.threeastronauts.api.contract.model.Vendor;
 import com.threeastronauts.api.contract.repository.ClientRepository;
 import com.threeastronauts.api.contract.repository.ContractRepository;
+import com.threeastronauts.api.contract.repository.InvoiceRepository;
 import com.threeastronauts.api.contract.repository.VendorRepository;
 import com.threeastronauts.api.contract.service.ContractService;
 import com.threeastronauts.api.contract.service.InvoiceService;
@@ -46,6 +49,9 @@ class ContractControllerTest {
 
   @Autowired
   ContractRepository contractRepository;
+
+  @Autowired
+  InvoiceRepository invoiceRepository;
 
   @Autowired
   ObjectMapper objectMapper;
@@ -90,7 +96,6 @@ class ContractControllerTest {
 
     mockMvc.perform(MockMvcRequestBuilders
             .get("/contract-api/contracts")
-            .param("vendorId", String.valueOf(2L))
             .param("contractId", String.valueOf(2L)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.terms").value("Terms."));
@@ -131,7 +136,6 @@ class ContractControllerTest {
 
     mockMvc.perform(MockMvcRequestBuilders
             .get("/contract-api/invoices")
-            .param("clientId", String.valueOf(1L))
             .param("invoiceId", String.valueOf(1L)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.timeInHours").value(10.0))
@@ -140,6 +144,27 @@ class ContractControllerTest {
         .andExpect(jsonPath("$.otherMaterialsCost").value(1.0))
         .andExpect(jsonPath("$.status").value(Status.APPROVED.toString()))
         .andExpect(jsonPath("$.total").value(0.0));
+  }
+
+  @Test
+  void shouldReturnOk_whenAnInvoiceIsMarkedAsVoid() throws Exception {
+    Invoice invoice = Invoice.builder()
+        .id(11L)
+        .status(Status.APPROVED)
+        .build();
+
+    InvoicePatchRequest request = InvoicePatchRequest.builder()
+        .id(invoice.getId())
+        .status(Status.VOID)
+        .build();
+
+    invoiceRepository.save(invoice);
+
+    mockMvc.perform(MockMvcRequestBuilders
+            .patch("/contract-api/invoices")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk());
   }
 
   @Test
