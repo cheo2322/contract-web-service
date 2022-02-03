@@ -23,7 +23,7 @@ The available requests are detailed next:
 
 ## Endpoints
 
-1. Create & issue a new invoice on a contract
+1. **Create & issue a new invoice on a contract**
 
    In order to fulfill this requirement, some data is introduced into database
    automatically when the project starts. It is achieved using the ```data.sql```
@@ -58,6 +58,30 @@ The available requests are detailed next:
    }'
    ```
    This request could be located as ```PostInvoice``` into the Postman collection file.
+
+
+2. **Mark an invoice as void**
+
+   Assuming _void_ as a new status of invoices, it is just a matter of patching an existing invoice using:
+
+   ```shell
+   curl --location --request PATCH 'localhost:8080/contract-api/invoices' \
+   --header 'Content-Type: application/json' \
+   --data-raw '{
+   "id": 1,
+   "status": "VOID"
+   }'
+   ```
+   
+   You could use the ```PatchInvoiceStatus``` request from the Postman collection.
+
+
+3. **Submitting an endpoint**
+
+   This requirement is some difficult to understand. In any case, all endpoints from the Postman
+   collection are so clear and useful, feel free to test them manually, I will resolve all your doubts
+   and comments, just chat me to sergio.hidalgo.e@gmail.com
+   
 
 ## Database model
 

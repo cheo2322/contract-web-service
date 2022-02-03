@@ -1,0 +1,143 @@
+{
+	"info": {
+		"_postman_id": "e98db516-5ba3-4fad-bc84-0941668276a5",
+		"name": "ContractApi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "PostContract",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"client\": {\r\n        \"username\": \"test-user\"\r\n    },\r\n    \"contract\": {\r\n        \"terms\": \"Terms.\",\r\n        \"value\": 100.00\r\n    },\r\n    \"vendor\": {\r\n        \"username\": \"test-vendor\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/contract-api/contracts",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"contract-api",
+						"contracts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetContract",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/contract-api/contracts?contractId=1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"contract-api",
+						"contracts"
+					],
+					"query": [
+						{
+							"key": "contractId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PostInvoice",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"contract\": {\r\n        \"id\": 1\r\n    },\r\n    \"invoice\": {\r\n        \"timeInHours\": 10,\r\n        \"hourCost\": 4.9,\r\n        \"otherMaterials\": \"Materials\",\r\n        \"otherMaterialsCost\": 1.0,\r\n        \"total\": 50.0\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/contract-api/invoices",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"contract-api",
+						"invoices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetInvoice",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/contract-api/invoices?invoiceId=1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"contract-api",
+						"invoices"
+					],
+					"query": [
+						{
+							"key": "invoiceId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PatchInvoiceStatus",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 1,\r\n    \"status\": \"VOID\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/contract-api/invoices",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"contract-api",
+						"invoices"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
