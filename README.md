@@ -12,8 +12,52 @@
    ```
    $ ./gradlew bootRun
    ```
-4. Perform the respective request using the postman collection
-attached to the project at the root directory.
+4. Perform the respective request using the Postman collection
+attached to the project at the root directory (ContractApi.postman_collection.json).
+The available requests are detailed next:
+ 
+   * Post a new contract
+   * Get a contract by id.
+   * Post a new invoice.
+   * Get an invoice by id.
+
+## Endpoints
+
+1. Create & issue a new invoice on a contract
+
+   In order to fulfill this requirement, some data is introduced into database
+   automatically when the project starts. It is achieved using the ```data.sql```
+   file found in resources, which is conformed by next commands:
+
+   ```mysql-sql
+   insert into clients (username) values ('test-user')
+
+   insert into vendors (username) values ('test-vendor')
+
+   insert into contracts (approved, terms, contract_value, client_id, vendor_id) values (1, '5465726d732e', 100.0, 1, 1)
+   ```
+   To test the functionality of this endpoint it is used the next request:
+
+   ```shell
+   curl --location --request POST 'localhost:8080/contract-api/invoices' \
+   --header 'Content-Type: application/json' \
+   --data-raw '{
+       "vendor": {
+           "username": "test-vendor"
+       },
+        "contract": {
+           "id": 1
+       },
+       "invoice": {
+           "timeInHours": 10,
+           "hourCost": 4.9,
+           "otherMaterials": "Materials",
+           "otherMaterialsCost": 1.0,
+           "total": 50.0
+       }
+   }'
+   ```
+   This request could be located as ```PostInvoice``` into the Postman collection file.
 
 ## Database model
 
