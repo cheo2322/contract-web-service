@@ -36,8 +36,7 @@ public class ContractController {
 
   @GetMapping("/contracts")
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<ContractDto> getContract(@RequestParam Long vendorId,
-      @RequestParam Long contractId) {
+  public ResponseEntity<ContractDto> getContract(@RequestParam Long contractId) {
 
     return ResponseEntity.ok(contractService.getContract(contractId));
   }
@@ -53,8 +52,7 @@ public class ContractController {
 
   @GetMapping("/invoices")
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<InvoiceDto> getInvoice(@RequestParam Long clientId,
-      @RequestParam Long invoiceId) {
+  public ResponseEntity<InvoiceDto> getInvoice(@RequestParam Long invoiceId) {
 
     return ResponseEntity.ok(invoiceService.getInvoice(invoiceId));
   }
