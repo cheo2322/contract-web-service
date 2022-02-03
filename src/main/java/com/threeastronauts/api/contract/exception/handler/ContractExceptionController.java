@@ -64,6 +64,7 @@ public class ContractExceptionController {
 
         ErrorResponse errorResponse = ErrorResponse.builder()
             .code("ERR-VAL-002")
+            .developerMessage(message)
             .userMessage(message)
             .moreInfo("moreInfo/ERR-VAL-002")
             .build();
